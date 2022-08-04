@@ -1,13 +1,18 @@
 package ru.netology.web;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.sql.SQLOutput;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CallbackTest {
 
@@ -15,11 +20,15 @@ public class CallbackTest {
 
     @BeforeAll
     static void setUpAll() {
-        System.setProperty("webdriver.chrome.driver", "driver/win/chromedriver.exe");
+        WebDriverManager.chromedriver().setup();
     }
 
     @BeforeEach
     void setUp() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless");
         driver = new ChromeDriver();
     }
 
@@ -33,5 +42,16 @@ public class CallbackTest {
     void firstTest() {
         driver.get("http://localhost:9999");
         System.out.println();
+    }
+
+    @Test
+    void secondTest() {
+        driver.get("http://localhost:9999");
+        driver.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Елена Кузнецова");
+        driver.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79150882118");
+        driver.findElement(By.className("checkbox__box")).click();
+        driver.findElement(By.className("button__text")).click();
+        String text = driver.findElement(By.className("Success_successBlock__2L3Cw")).getText();
+        assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", text.trim());
     }
 }
